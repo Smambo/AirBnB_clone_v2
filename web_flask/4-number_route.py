@@ -33,7 +33,7 @@ def python_text(text="is cool"):
 
 @app.route('/number/<n>', strict_slashes=False)
 def number(n):
-    """."""
+    """Displays the value of n, which must be an int."""
     try:
         return ("{} is a number".format(int(n)))
     except:
