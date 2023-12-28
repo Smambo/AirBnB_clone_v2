@@ -5,18 +5,17 @@ from flask import Flask
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route('/', strict_slashes=False)
 def hello_world():
     """Displays string of characters"""
     return ("Hello HBNB!")
 
 
-@app.route('/hbnb')
+@app.route('/hbnb', strict_slashes=False)
 def hbnb():
     """Displays HBNB text"""
     return ("HBNB")
 
 
 if __name__ == "__main__":
-    app.url_map.strict_slashes = False
     app.run(host="0.0.0.0.", port=5000)
