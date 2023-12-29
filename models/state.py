@@ -27,7 +27,7 @@ class State(BaseModel, Base):
         """Initialises state class."""
         super().__init__(*args, **kwargs)
 
-    if models.base_model.storage_t != "db":
+    if os.getenv("HBNB_TYPE_STORAGE") != "db":
         @property
         def cities(self):
             """gets list of city instances related to state instance"""
