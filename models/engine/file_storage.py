@@ -74,3 +74,7 @@ class FileStorage:
         if obj:
             obj_key = "{}.{}".format(obj.__class__.__name__, obj.id)
             self.__objects.pop(obj_key, None)
+
+    def close(self):
+        """Calls the reload method"""
+        self.reload()
