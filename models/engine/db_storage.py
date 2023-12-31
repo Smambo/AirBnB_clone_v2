@@ -2,8 +2,14 @@
 """this module defines a class to manage db storage for hbnb clone"""
 from sqlalchemy import create_engine
 import os
-from sqlalchemy.orm import sessionmaker, scoped_session
-import models
+from sqlalchemy.orm import sessionmaker, scoped_session, relationship
+from models.base_model import Base, BaseModel
+from models.amenity import Amenity
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
 
 
 class DBStorage:
@@ -24,27 +30,21 @@ class DBStorage:
                 )
 
         if os.getenv('HBNB_ENV') == 'test':
-            models.base_model.Base.metadata.drop_all(self.__engine)
+            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        session = self.__session()
-        if cls:
-            objects = session.query(cls).all()
+        if cls is None:
+            objects = self.__session.query(State).all()
+            objects.extend(self.__session.query(City).all())
+            objects.extend(self.__session.query(Amenity).all())
+            objects.extend(self.__session.query(Place).all())
+            objects.extend(self.__session.query(Review).all())
+            objects.extend(self.__session.query(User).all())
         else:
-            classes = [
-                    models.base_model.User,
-                    models.base_model.State,
-                    models.base_model.City,
-                    models.base_model.Amenity,
-                    models.base_model.Place,
-                    models.base_model.Review
-            ]
-            objects = []
-            for clas in classes:
-                objects.extend(session.query(clas).all())
-
-        session.close()
+            if type(cls) == str:
+                cls = eval(cls)
+            objects = self.__session.query(cls)
         obj_dict = {f"{type(obj).__name__}.{obj.id}": obj for obj in objects}
         return obj_dict
 
@@ -53,22 +53,17 @@ class DBStorage:
         if obj:
             session = self.__session()
             session.add(obj)
-            session.commit()
-            session.close()
 
     def save(self):
         """Saves storage to Database"""
         session = self.__session()
         session.commit()
-        session.close()
 
     def delete(self, obj=None):
         """Deletes object from Database"""
         if obj:
             session = self.__session()
             session.delete(obj)
-            session.commit()
-            session.close()
 
     def reload(self):
         """Loads storage dictionary from Database"""
